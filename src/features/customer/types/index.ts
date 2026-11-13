@@ -21,6 +21,7 @@ export interface ClienteResponse {
     correo: string;
     nombreUsuario: string;
     estadoCuenta: boolean;
+    motivo?: string | null;
     bloqueado: boolean;
     fechaCreacion: string;
     mensaje: string;
