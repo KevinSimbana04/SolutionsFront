@@ -59,7 +59,7 @@ export default function AsideBar() {
     })).filter((section) => section.items.length > 0);
 
     return (
-        <aside className="w-64 h-full shrink-0 bg-white border-r border-gray-200 flex flex-col justify-between p-4 select-none overflow-y-auto">
+        <aside className="sticky top-0 h-screen w-64 shrink-0 bg-white border-r border-gray-200 flex flex-col justify-between p-4 select-none overflow-y-auto">
             <div>
                 <div className="flex items-center gap-3 px-3 py-3 mb-6">
                     <img src="/logo-int2.ico" alt="INT-SOLUTION" className="w-8 h-8 object-contain" />

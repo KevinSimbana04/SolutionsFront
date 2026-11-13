@@ -34,7 +34,7 @@ export const empleadoSchema = z.object({
         .string()
         .trim()
         .min(1, { message: 'El cargo es obligatorio' }),
-    rol: z.enum(['ADMINISTRATIVO', 'TECNICO'], { message: 'El rol es obligatorio' })
+    rol: z.enum(['ADMINISTRADOR', 'ADMINISTRATIVO', 'TECNICO'], { message: 'El rol es obligatorio' })
 });
 
 export type EmpleadoFormData = z.infer<typeof empleadoSchema>;

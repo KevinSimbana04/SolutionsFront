@@ -36,6 +36,17 @@ const camposEditables = [
     { name: 'cargo', label: 'Cargo', type: 'text' },
 ] as const;
 
+const camposPersonales = camposEditables.filter(({ name }) =>
+    name === 'identificacion' || name === 'nombres' || name === 'apellidos' || name === 'cargo',
+);
+const camposContacto = camposEditables.filter(({ name }) =>
+    name === 'telefono' || name === 'correo' || name === 'direccion',
+);
+const seccionesCampos = [
+    { title: 'Datos personales', fields: camposPersonales },
+    { title: 'Contacto y permisos', fields: camposContacto },
+];
+
 export default function EmpleadoTable({ refreshKey = 0 }: EmpleadoTableProps) {
     const [empleados, setEmpleados] = useState<EmpleadoResponse[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -48,6 +59,15 @@ export default function EmpleadoTable({ refreshKey = 0 }: EmpleadoTableProps) {
     const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<EmpleadoFormData>({
         resolver: zodResolver(empleadoSchema),
     });
+
+    const abrirVista = async (empleado: EmpleadoResponse) => {
+        try {
+            const detalle = await empleadoService.obtenerEmpleadoPorId(empleado.empleadoId);
+            setModal({ type: 'view', empleado: detalle });
+        } catch (error) {
+            toast.error(getErrorMessage(error, 'No se pudieron cargar los datos del empleado.'));
+        }
+    };
 
     useEffect(() => {
         let isCurrent = true;
@@ -167,7 +187,7 @@ export default function EmpleadoTable({ refreshKey = 0 }: EmpleadoTableProps) {
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex justify-end gap-2">
-                                            <button onClick={() => setModal({ type: 'view', empleado })} className="rounded-md p-2 text-gray-600 hover:bg-blue-50 hover:text-primary"><LuEye className="h-4 w-4" /></button>
+                                            <button type="button" onClick={() => void abrirVista(empleado)} title="Ver empleado" aria-label={`Ver a ${empleado.nombres} ${empleado.apellidos}`} className="rounded-md p-2 text-gray-600 hover:bg-blue-50 hover:text-primary"><LuEye className="h-4 w-4" /></button>
                                             <button onClick={() => abrirEdicion(empleado)} className="rounded-md p-2 text-gray-600 hover:bg-amber-50 hover:text-amber-700"><LuPencil className="h-4 w-4" /></button>
                                             <button onClick={() => { setMotivo(''); setModal({ type: 'deactivate', empleado }); }} disabled={!empleado.estadoCuenta} className="rounded-md p-2 text-gray-600 hover:bg-red-50 hover:text-red-600 disabled:opacity-40"><LuUserX className="h-4 w-4" /></button>
                                         </div>
@@ -179,44 +199,134 @@ export default function EmpleadoTable({ refreshKey = 0 }: EmpleadoTableProps) {
                 </table>
             </div>
 
-            {/* Modales (manteniendo la misma estructura HTML pero resumida por brevedad visual) */}
             {modal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-                    <section className="w-full max-w-2xl rounded-xl bg-white shadow-xl p-6">
-                        <div className="flex justify-between border-b pb-4 mb-4">
-                            <h3 className="text-h2 text-dark">
-                                {modal.type === 'view' ? 'Datos del empleado' : modal.type === 'edit' ? 'Editar empleado' : 'Desactivar cuenta'}
-                            </h3>
-                            <button onClick={() => setModal(null)} className="p-2 hover:bg-gray-100 rounded-md"><LuX className="h-5 w-5" /></button>
+                <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-4">
+                    <section role="dialog" aria-modal="true" aria-labelledby="empleado-modal-title" className="my-auto max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-6 shadow-xl">
+                        <div className="mb-4 flex items-start justify-between">
+                            <div>
+                                <h3 id="empleado-modal-title" className="text-h2 text-dark">
+                                    {modal.type === 'view' ? 'Datos del empleado' : modal.type === 'edit' ? 'Editar empleado' : 'Desactivar cuenta'}
+                                </h3>
+                                {modal.type === 'view' && (
+                                    <p className="mt-1 text-footer text-secondary">Consulta la información y el estado de la cuenta.</p>
+                                )}
+                            </div>
+                            <button type="button" onClick={() => setModal(null)} aria-label="Cerrar" className="rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-dark"><LuX className="h-5 w-5" /></button>
                         </div>
-                        
-                        {/* Lógica condicional de los modales original */}
+
                         {modal.type === 'view' && (
-                            <dl className="grid gap-4 sm:grid-cols-2">
-                                {[['Nombre', modal.empleado.nombres], ['Apellido', modal.empleado.apellidos], ['Cargo', modal.empleado.cargo], ['Estado', modal.empleado.estadoCuenta ? 'Activa' : 'Inactiva']].map(([l, v]) => (
-                                    <div key={l}><dt className="text-label text-gray-500">{l}</dt><dd className="mt-1 text-main text-dark">{v}</dd></div>
-                                ))}
-                            </dl>
+                            <div className="space-y-5 px-6 py-5">
+                                <section className="rounded-xl bg-slate-50 px-5 py-4">
+                                    <h4 className="mb-3 text-h3 text-secondary">Datos personales</h4>
+                                    <dl className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
+                                        {[
+                                            ['Nombre', modal.empleado.nombres],
+                                            ['Apellido', modal.empleado.apellidos],
+                                            ['Identificación', modal.empleado.identificacion],
+                                            ['Cargo', modal.empleado.cargo],
+                                        ].map(([label, value]) => (
+                                            <div key={label}>
+                                                <dt className="text-label text-secondary">{label}</dt>
+                                                <dd className="mt-1 break-words text-main text-dark">{value || 'No disponible'}</dd>
+                                            </div>
+                                        ))}
+                                    </dl>
+                                </section>
+                                <section className="rounded-xl bg-slate-50 px-5 py-4">
+                                    <h4 className="mb-3 text-h3 text-secondary">Contacto y permisos</h4>
+                                    <dl className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
+                                        {[
+                                            ['Teléfono', modal.empleado.telefono],
+                                            ['Correo electrónico', modal.empleado.correo],
+                                            ['Dirección', modal.empleado.direccion],
+                                            ['Rol', modal.empleado.rol === 'ADMINISTRADOR' ? 'Administrador' : modal.empleado.rol === 'ADMINISTRATIVO' ? 'Administrativo' : 'Técnico'],
+                                        ].map(([label, value]) => (
+                                            <div key={label}>
+                                                <dt className="text-label text-secondary">{label}</dt>
+                                                <dd className="mt-1 break-words text-main text-dark">{value || 'No disponible'}</dd>
+                                            </div>
+                                        ))}
+                                    </dl>
+                                </section>
+                                <section className="rounded-xl bg-slate-50 px-5 py-4">
+                                    <h4 className="mb-3 text-h3 text-secondary">Cuenta</h4>
+                                    <dl className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
+                                        {[
+                                            ['Cuenta bloqueada', modal.empleado.bloqueado ? 'Sí' : 'No'],
+                                            ['Fecha de registro', modal.empleado.fechaCreacion ? new Date(modal.empleado.fechaCreacion).toLocaleDateString() : 'No disponible'],
+                                        ].map(([label, value]) => (
+                                            <div key={label}>
+                                                <dt className="text-label text-secondary">{label}</dt>
+                                                <dd className="mt-1 break-words text-main text-dark">{value || 'No disponible'}</dd>
+                                            </div>
+                                        ))}
+                                        <div>
+                                            <dt className="text-label text-secondary">Estado</dt>
+                                            <dd className="mt-1">
+                                                <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${modal.empleado.estadoCuenta ? 'bg-green-100 text-green-700' : 'bg-slate-200 text-slate-600'}`}>
+                                                    {modal.empleado.estadoCuenta ? 'Activa' : 'Inactiva'}
+                                                </span>
+                                            </dd>
+                                        </div>
+                                    </dl>
+                                </section>
+                            </div>
                         )}
 
                         {modal.type === 'edit' && (
                             <form onSubmit={handleSubmit(guardarCambios)} className="space-y-4">
-                                <div className="grid gap-4 sm:grid-cols-2">
-                                    {camposEditables.map(({ name, label, type }) => (
-                                        <div key={name}>
-                                            <label className="mb-1 block text-label text-dark">{label}</label>
-                                            <input type={type} {...register(name)} className="w-full rounded-md border border-gray-300 px-3 py-2 text-main focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
-                                            {errors[name] && <span className="text-xs text-red-600">{errors[name]?.message}</span>}
+                                {!modal.empleado.estadoCuenta && (
+                                    <p className="rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                                        La cuenta está inactiva. Solo puedes actualizar el correo electrónico.
+                                    </p>
+                                )}
+                                {seccionesCampos.map(({ title, fields }) => (
+                                    <section key={title}>
+                                        <h4 className="mb-3 text-sm font-semibold text-dark">{title}</h4>
+                                        <div className="grid gap-4 sm:grid-cols-2">
+                                            {fields.map(({ name, label, type }) => {
+                                                const readOnly = !modal.empleado.estadoCuenta && name !== 'correo';
+                                                return (
+                                                    <div key={name}>
+                                                        <label htmlFor={`editar-empleado-${name}`} className="mb-1 block text-label text-dark">{label}</label>
+                                                        <input
+                                                            id={`editar-empleado-${name}`}
+                                                            type={type}
+                                                            readOnly={readOnly}
+                                                            aria-invalid={Boolean(errors[name])}
+                                                            {...register(name)}
+                                                            className={`w-full rounded-md border border-gray-300 px-3 py-2 text-main focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary ${readOnly ? 'cursor-not-allowed bg-gray-100 text-gray-500' : ''}`}
+                                                        />
+                                                        {errors[name] && <span className="text-xs text-red-600">{errors[name]?.message}</span>}
+                                                    </div>
+                                                );
+                                            })}
+                                            {title === 'Contacto y permisos' && (
+                                                <div>
+                                                    <label htmlFor="editar-empleado-rol" className="mb-1 block text-label text-dark">Rol</label>
+                                                    {modal.empleado.estadoCuenta ? (
+                                                        <select id="editar-empleado-rol" {...register('rol')} className="w-full rounded-md border border-gray-300 px-3 py-2 text-main">
+                                                            <option value="ADMINISTRADOR">Administrador</option>
+                                                            <option value="ADMINISTRATIVO">Administrativo</option>
+                                                            <option value="TECNICO">Técnico</option>
+                                                        </select>
+                                                    ) : (
+                                                        <>
+                                                            <input type="hidden" {...register('rol')} />
+                                                            <input
+                                                                id="editar-empleado-rol"
+                                                                type="text"
+                                                                value={modal.empleado.rol === 'ADMINISTRADOR' ? 'Administrador' : modal.empleado.rol === 'ADMINISTRATIVO' ? 'Administrativo' : 'Técnico'}
+                                                                readOnly
+                                                                className="w-full cursor-not-allowed rounded-md border border-gray-300 bg-gray-100 px-3 py-2 text-main text-gray-500"
+                                                            />
+                                                        </>
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
-                                    ))}
-                                    <div>
-                                        <label className="mb-1 block text-label text-dark">Rol</label>
-                                        <select {...register('rol')} className="w-full rounded-md border border-gray-300 px-3 py-2 text-main">
-                                            <option value="ADMINISTRATIVO">Administrativo</option>
-                                            <option value="TECNICO">Técnico</option>
-                                        </select>
-                                    </div>
-                                </div>
+                                    </section>
+                                ))}
                                 <div className="flex justify-end gap-3 mt-6">
                                     <button type="button" onClick={() => setModal(null)} className="rounded-lg border border-gray-300 px-4 py-2 hover:bg-gray-50">Cancelar</button>
                                     <button type="submit" disabled={isSubmitting} className="rounded-lg bg-primary px-4 py-2 text-white hover:bg-primary-hover disabled:bg-gray-400">Guardar</button>

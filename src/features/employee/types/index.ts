@@ -1,7 +1,6 @@
 import type { Rol } from '@/store/authStore';
 
-// El backend solo permite estos roles para los empleados
-export type EmpleadoRol = Extract<Rol, 'ADMINISTRATIVO' | 'TECNICO'>;
+export type EmpleadoRol = Extract<Rol, 'ADMINISTRADOR' | 'ADMINISTRATIVO' | 'TECNICO'>;
 
 export interface EmpleadoRequest {
     identificacion: string;
