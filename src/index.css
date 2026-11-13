@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+@theme {
+
+  --font-sans: 'Roboto', system-ui, -apple-system, sans-serif;
+  --font-roboto: 'Roboto', system-ui, -apple-system, sans-serif;
+  --font-mono: 'Roboto Mono', monospace;
+
+
+  --color-brand-blue-dark: #116EBF;
+  --color-brand-blue: #4992BF;
+  --color-brand-blue-light: #499EBF;
+  --color-brand-gray: #F2F2F2;
+  --color-brand-black: #0D0D0D;
+
+
+  --color-primary: #116EBF;
+  --color-primary-hover: #0e5b9e;
+  --color-secondary: #4992BF;
+  --color-accent: #499EBF;
+  --color-surface: #F2F2F2;
+  --color-dark: #0D0D0D;
+}
+
+
+@layer utilities {
+  .text-h1 {
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .text-h2 {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .text-h3 {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .text-main {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+  }
+
+  .text-table {
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .text-footer {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.4;
+  }
+
+  .text-status {
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .text-label {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-dark);
+}
