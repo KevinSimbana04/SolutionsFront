@@ -8,6 +8,8 @@ import { isAxiosError } from 'axios';
 
 import { loginSchema, type LoginFormData } from '../schemas/auth.schema';
 import { authService } from '../api/auth.Service';
+import { empleadoService } from '@/features/employee/api/employee.service';
+import { clienteService } from '@/features/customer/api/customer.service';
 import { useAuthStore } from '@/store/authStore';
 
 export function LoginForm() {
@@ -30,21 +32,48 @@ export function LoginForm() {
   const onSubmit = async (data: LoginFormData) => {
     try {
       const response = await authService.login(data);
-      
-      loginStore(
-        { 
-          id: 0, 
-          name: response.nombreUsuario, 
-          role: response.rol,
-          requiereCambioClave: response.requiereCambioClave
-        },
-        response.token
-      );
+
+      const user = {
+        id: 0,
+        name: response.nombreUsuario,
+        role: response.rol,
+        requiereCambioClave: response.requiereCambioClave
+      };
+      loginStore(user, response.token);
 
       if (response.requiereCambioClave) {
         toast.info(response.mensaje);
         navigate('/configurar-credenciales', { replace: true });
         return;
+      }
+
+      try {
+        let fullName: string | undefined;
+        if (response.rol === 'CLIENTE') {
+          const clientes = await clienteService.listarClientes(response.nombreUsuario);
+          const cliente = clientes.find((item) =>
+            item.identificacion === response.nombreUsuario ||
+            item.nombreUsuario === response.nombreUsuario
+          );
+          if (cliente) fullName = `${cliente.nombres} ${cliente.apellidos}`.trim();
+        } else {
+          const empleados = await empleadoService.listarEmpleados();
+          const empleado = empleados.find((item) =>
+            item.identificacion === response.nombreUsuario
+          );
+          if (empleado) fullName = `${empleado.nombres} ${empleado.apellidos}`.trim();
+        }
+
+        if (fullName) {
+          loginStore({ ...user, fullName }, response.token);
+        } else {
+          toast.warning('No se encontró el nombre de la persona asociada a esta cuenta.');
+        }
+      } catch (error) {
+        const message = isAxiosError<{ mensaje?: string }>(error)
+          ? error.response?.data?.mensaje
+          : undefined;
+        toast.warning(message || 'No se pudo cargar el nombre de la persona asociada a esta cuenta.');
       }
 
       toast.success(response.mensaje || `¡Bienvenido, ${response.nombreUsuario}!`);

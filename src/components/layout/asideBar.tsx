@@ -40,6 +40,7 @@ const NAVIGATION_CONFIG: NavSection[] = [
 export default function AsideBar() {
     const { user, logout } = useAuthStore();
     const navigate = useNavigate();
+    const displayName = user?.fullName || user?.name;
 
     const handleLogout = () => {
         logout();
@@ -102,11 +103,11 @@ export default function AsideBar() {
             <div className="pt-4 border-t border-gray-200 flex items-center justify-between px-2">
                 <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center text-sm">
-                        {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
+                        {displayName ? displayName.charAt(0).toUpperCase() : "U"}
                     </div>
                     <div className="flex flex-col text-left">
                         <span className="text-sm font-semibold text-dark leading-tight">
-                            {user?.name || "Usuario"}
+                            {displayName || "Usuario"}
                         </span>
                         <span className="text-xs text-gray-400 leading-tight capitalize">
                             {user?.role ? user.role.toLowerCase() : "Sin rol"}

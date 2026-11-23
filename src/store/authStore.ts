@@ -6,6 +6,7 @@ export type Rol = 'ADMINISTRADOR' | 'ADMINISTRATIVO' | 'TECNICO' | 'CLIENTE';
 export interface User {
   id: number;
   name: string;
+  fullName?: string;
   role: Rol;
   requiereCambioClave: boolean;
 }
