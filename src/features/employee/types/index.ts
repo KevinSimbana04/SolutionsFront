@@ -29,3 +29,10 @@ export interface EmpleadoResponse {
     fechaCreacion: string;
     mensaje: string;
 }
+
+export interface TecnicoDisponible {
+    empleadoId: number;
+    nombres: string;
+    apellidos: string;
+    cargo: string;
+}

@@ -1,5 +1,10 @@
+
+
 export default function TechnicalHome() {
     return (
-        <h1 className="text-h1 text-dark color-primary">Técnico</h1>
-    )
+        <div>
+            <h1>Technical Home Page</h1>
+            <p>Welcome to the technical section of our application.</p>
+        </div>
+    );
 }

@@ -1,5 +1,5 @@
 import { apiClient } from '@/lib/axios';
-import type { EmpleadoRequest, EmpleadoResponse } from '../types';
+import type { EmpleadoRequest, EmpleadoResponse, TecnicoDisponible } from '../types';
 
 export const empleadoService = {
     crearEmpleado: async (data: EmpleadoRequest): Promise<EmpleadoResponse> => {
@@ -27,6 +27,10 @@ export const empleadoService = {
             `/empleados/${empleadoId}/desactivar`,
             { motivo }
         );
+        return response.data;
+    },
+    listarTecnicos: async (): Promise<TecnicoDisponible[]> => {
+        const response = await apiClient.get<TecnicoDisponible[]>('/empleados/tecnicos');
         return response.data;
     }
 };
