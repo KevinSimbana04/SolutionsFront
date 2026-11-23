@@ -15,6 +15,11 @@ const ROUTE_CONFIG: Record<string, { category: string; title: string }> = {
     "/administrativo/home": { category: "Operación", title: "Panel general" },
     "/administrativo/customer": { category: "Operación", title: "Clientes" },
     "/administrativo/equipment": { category: "Operación", title: "Equipos" },
+
+    "/admin/orders": { category: "Operación", title: "Órdenes de trabajo" },
+    "/administrativo/order": { category: "Operación", title: "Órdenes de trabajo" },
+    "/tecnico/home": { category: "Taller", title: "Bandeja de trabajo" },
+     "/cliente/home": { category: "Mi cuenta", title: "Mis reparaciones" },
 };
 
 function formatSegment(segment: string): string {

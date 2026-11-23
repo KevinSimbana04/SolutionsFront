@@ -1,5 +1,9 @@
+import ClientOrderList from "@/features/orders/components/customerOrder/clientOrderList";
+
 export default function CustomerHome() {
     return (
-        <h1 className="text-h1 text-dark color-primary">Cliente</h1>
-    )
+        <div className="w-full space-y-8">
+            <ClientOrderList />
+        </div>
+    );
 }

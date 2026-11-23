@@ -1,4 +1,4 @@
-import { LuLayoutDashboard, LuUsers, LuSettings, LuLogOut } from "react-icons/lu";
+import { LuLayoutDashboard, LuUsers, LuSettings, LuLogOut, LuClipboardList, LuHistory } from "react-icons/lu";
 import { GrCubes } from "react-icons/gr";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuthStore, type Rol } from "@/store/authStore";
@@ -22,11 +22,15 @@ const NAVIGATION_CONFIG: NavSection[] = [
         items: [
             { name: "Panel general", to: "/admin/home", icon: LuLayoutDashboard, roles: ["ADMINISTRADOR"] },
             { name: "Usuarios", to: "/admin/user", icon: LuUsers, roles: ["ADMINISTRADOR"] },
+            { name: "Órdenes", to: "/admin/orders", icon: LuClipboardList, roles: ["ADMINISTRADOR"] },
             { name: "Inicio", to: "/administrativo/home", icon: LuLayoutDashboard, roles: ["ADMINISTRATIVO"] },
             { name: "Clientes", to: "/administrativo/customer", icon: LuUsers, roles: ["ADMINISTRATIVO"] },
             { name: "Equipos", to: "/administrativo/equipment", icon: GrCubes, roles: ["ADMINISTRATIVO"] },
+            {name: "Órdenes", to: "/administrativo/order", icon: GrCubes, roles: ["ADMINISTRATIVO"]},
             { name: "Inicio", to: "/tecnico/home", icon: LuLayoutDashboard, roles: ["TECNICO"] },
-            { name: "Inicio", to: "/cliente/home", icon: LuLayoutDashboard, roles: ["CLIENTE"] },
+            { name: "En proceso", to: "/tecnico/ordenes", icon: LuClipboardList, roles: ["TECNICO"] },
+            { name: "Finalizadas", to: "/tecnico/finalizadas", icon: LuHistory, roles: ["TECNICO"] },
+            { name: "Mis órdenes", to: "/cliente/home", icon: LuClipboardList, roles: ["CLIENTE"] },
         ],
     },
     {

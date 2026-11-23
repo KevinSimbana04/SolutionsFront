@@ -10,14 +10,18 @@ export default function ActivarCuenta() {
     const [searchParams] = useSearchParams();
     const token = searchParams.get('token');
     const hasFetched = useRef(false);
-    
-    const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
-    const [message, setMessage] = useState('Verificando tu enlace de activación...');
+
+    const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
+        token ? 'loading' : 'error'
+    );
+    const [message, setMessage] = useState(
+        token
+            ? 'Verificando tu enlace de activación...'
+            : 'Enlace inválido. No se encontró el token de activación en la URL.'
+    );
 
     useEffect(() => {
         if (!token) {
-            setStatus('error');
-            setMessage('Enlace inválido. No se encontró el token de activación en la URL.');
             return;
         }
 
