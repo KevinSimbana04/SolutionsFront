@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { LuX } from "react-icons/lu";
 import { toast } from "react-toastify";
 
 import { presupuestoService } from "../api/budget.service";
